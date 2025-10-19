@@ -307,6 +307,153 @@ connect:
 
 ---
 
+# 🧩 Problem 3: LeetCode 25 — Reverse Nodes in k-Group
+
+## 📖 Problem Description
+
+Given the head of a linked list, reverse the nodes of the list **k at a time**, and return the modified list.  
+If the number of nodes is not a multiple of k, leave the remaining nodes as they are.
+
+**Examples:**
+
+```
+Input: 1 → 2 → 3 → 4 → 5, k = 2
+Output: 2 → 1 → 4 → 3 → 5
+```
+
+```
+Input: 1 → 2 → 3 → 4 → 5, k = 3
+Output: 3 → 2 → 1 → 4 → 5
+```
+
+---
+
+## 🧠 Approach
+
+This problem is an advanced version of linked list reversal —  
+instead of reversing the entire list, we reverse every group of **k** nodes.
+
+### Step-by-step Logic
+
+1. Count the total length `n` of the linked list.  
+2. Use a dummy head node to simplify edge cases.  
+   - `p0` will always point to the **node before** the current group.  
+3. While there are at least `k` nodes remaining:
+   - Reverse the next `k` nodes.
+   - Reconnect the reversed part with the previous and next segments.
+   - Move `p0` forward to prepare for the next group.
+4. If fewer than `k` nodes remain, stop.
+
+---
+
+## 🔁 Key Pointer Connections
+
+Before reversing:
+
+```
+[p0] → a1 → a2 → ... → ak → cur
+```
+
+After reversing:
+
+```
+[p0] → ak → ... → a2 → a1 → cur
+```
+
+Reconnection logic:
+
+| Step | Code | Explanation |
+|------|------|--------------|
+| 1 | `nxt = p0.next` | Save the original head (will become the tail after reversal) |
+| 2 | `p0.next.next = cur` | Connect the new tail to the start of the next group |
+| 3 | `p0.next = pre` | Connect the previous part to the new head |
+| 4 | `p0 = nxt` | Move `p0` to the new tail for the next round |
+
+---
+
+## 💻 Python Implementation
+
+```python
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+class Solution(object):
+    def reverseKGroup(self, head, k):
+        # 1️⃣ Count total length
+        n = 0
+        cur = head
+        while cur:
+            n += 1
+            cur = cur.next
+
+        # 2️⃣ Dummy node and group head
+        dummy = ListNode(0, head)
+        p0 = dummy  # p0: previous node before the group
+
+        # 3️⃣ Reverse group by group
+        while n >= k:
+            n -= k
+            pre = None
+            cur = p0.next
+
+            # Reverse k nodes
+            for _ in range(k):
+                nxt = cur.next
+                cur.next = pre
+                pre = cur
+                cur = nxt
+
+            # After reversal: pre = new head, cur = next group's start
+            nxt = p0.next          # original head → new tail
+            p0.next.next = cur     # new tail → next group
+            p0.next = pre          # previous part → new head
+            p0 = nxt               # move p0 to new tail
+
+        return dummy.next
+```
+
+---
+
+## ⚙️ Complexity Analysis
+
+| Type | Complexity | Explanation |
+|------|-------------|-------------|
+| Time | **O(n)** | Each node is visited twice (count + reverse) |
+| Space | **O(1)** | In-place reversal, no extra structures |
+
+---
+
+## 🧷 Summary
+
+- `p0` always points to the **node before the current group**.  
+- `pre`, `cur`, and `nxt` are reinitialized for each group.  
+- The four-line reconnection logic is the key part of the algorithm.  
+- The dummy node simplifies handling of the first reversed segment.
+
+---
+
+## 🧩 Example Trace (k = 2)
+
+```
+Original:  1 → 2 → 3 → 4 → 5
+After 1st group:  2 → 1 → 3 → 4 → 5
+After 2nd group:  2 → 1 → 4 → 3 → 5
+```
+
+---
+
+## ✅ Key Takeaway
+
+Even though the logic looks complex, the main pattern is simple:
+
+> “Reverse k nodes, reconnect 3 parts, move on.”
+
+Once you master this pattern, most advanced linked list manipulation problems will feel natural.
+---
+
 ### ⚠️ Common Mistakes
 
 - ❌ Forget to reattach: `pre.next.next = cur`  
@@ -332,6 +479,9 @@ connect:
 |----------|--------------|------------|-------------|
 | 206 | Reverse the entire list | Three pointers (`prev-cur-nxt`) | 🟢 Easy |
 | 92 | Reverse a sublist | Dummy node + partial reverse | 🟡 Medium |
+| 25 | Reverse Nodes in k-Group | Dummy node + partial reverse | 🟡 Hard |
+
+
 
 ---
 
